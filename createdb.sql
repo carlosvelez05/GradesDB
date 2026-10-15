@@ -61,7 +61,7 @@ CREATE TABLE groups (
     activity VARCHAR(15) NOT NULL,
     academic_year YEAR NOT NULL,
     PRIMARY KEY (group_id),
-    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)
+    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE
 );
 
 CREATE TABLE group_enrollments (
@@ -100,3 +100,51 @@ CREATE TABLE teaching_loads (
     FOREIGN KEY (professor_id) REFERENCES professors(professor_id),
     FOREIGN KEY (group_id) REFERENCES groups(group_id)
 );
+
+ALTER TABLE people
+    ADD CONSTRAINT rn12_people_age CHECK (age BETWEEN 16 AND 70),
+    ADD CONSTRAINT rn14_people_dni CHECK (dni REGEXP '^[0-9]{8}[A-Za-z]$'),
+    ADD CONSTRAINT rn_uq_people_dni UNIQUE (dni),
+    ADD CONSTRAINT rn_uq_people_email UNIQUE (email);
+    
+ALTER TABLE professors
+    ADD CONSTRAINT ck_professors_category CHECK (
+        category IN ('Ayudante','AyudanteDoctor','Titular','Catedrático')
+    );
+    
+ALTER TABLE students
+    ADD CONSTRAINT ck_students_access_method CHECK (
+        access_method IN ('Selectividad','Ciclo','Mayor','Titulado','Extranjero')
+    );
+    
+ALTER TABLE degrees
+    ADD CONSTRAINT rn13_degree_duration CHECK (duration_years BETWEEN 3 AND 6),
+    ADD CONSTRAINT rn_uq_degrees_name UNIQUE (degree_name);
+    
+ALTER TABLE subjects
+    ADD CONSTRAINT rn10_subjects_credits CHECK (credits IN (6, 12)),
+    ADD CONSTRAINT rn16_subjects_course CHECK (course BETWEEN 1 AND 6),
+    ADD CONSTRAINT ck_subjects_type CHECK (
+        subject_type IN ('Formación Básica','Obligatoria','Optativa')
+    ),
+    ADD CONSTRAINT rn_uq_subjects_name UNIQUE (subject_name),
+    ADD CONSTRAINT rn_uq_subjects_acronym UNIQUE (acronym);
+    
+ALTER TABLE groups
+    ADD CONSTRAINT rn15_groups_year CHECK (academic_year BETWEEN 2000 AND 2100),
+    ADD CONSTRAINT ck_groups_activity CHECK (
+        activity IN ('Teoría','Laboratorio')
+    ),
+    ADD CONSTRAINT rn_uq_groups_name UNIQUE (subject_id, group_name, academic_year);
+
+ALTER TABLE teaching_loads
+    ADD CONSTRAINT ck_teaching_loads_credits CHECK (credits > 0);
+    
+ALTER TABLE grades
+    ADD CONSTRAINT rn11_grades_value CHECK (grade_value BETWEEN 0 AND 10),
+    ADD CONSTRAINT rn01_grades_with_honors CHECK (
+        with_honors = 0 OR grade_value >= 9
+    ),
+    ADD CONSTRAINT rn18_grades_exam_call CHECK (
+        exam_call IN ('Primera','Segunda','Tercera','Extraordinaria')
+    );
