@@ -1,9 +1,10 @@
 USE grados;
--- =============================================================
+
+-- 1)
 -- TABLA DE RESULTADOS
 -- Un registro por test: PASS si la operación prohibida se rechazó,
 -- FAIL si se permitió
--- =============================================================
+
 CREATE OR REPLACE TABLE test_results (
     test_id VARCHAR(20) PRIMARY KEY,
     test_name VARCHAR(200) NOT NULL,
@@ -12,11 +13,11 @@ CREATE OR REPLACE TABLE test_results (
     execution_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =============================================================
+-- 2)
 -- PROCEDIMIENTO AUXILIAR
 -- Registra el resultado de un test. El nombre es el texto del mensaje
 -- anterior a ':' (SUBSTRING_INDEX), por ejemplo 'RN01'
--- =============================================================
+
 DELIMITER //
 CREATE OR REPLACE PROCEDURE p_log_test(
     IN p_test_id VARCHAR(20),
@@ -29,7 +30,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- =============================================================
+-- 3)Test de RN01 y RN09 a RN16
 -- TESTS DE RESTRICCIONES DECLARATIVAS
 -- Todos siguen el mismo esquema:
 -- 1. Un handler: si la operación lanza un error (SQLEXCEPTION), registra
@@ -37,7 +38,6 @@ DELIMITER ;
 -- 2. p_populate() restaura los datos iniciales.
 -- 3. Se intenta la operación que la regla prohíbe.
 -- 4. Si la ejecución llega a la última línea, no hubo error: FAIL.
--- =============================================================
 
 -- Test RN01: Matrícula de honor requiere nota >= 9
 DELIMITER //
@@ -182,11 +182,11 @@ BEGIN
 END //
 DELIMITER ;
 
--- =============================================================
+-- 4)
 -- ORQUESTADOR DE RESTRICCIONES DECLARATIVAS
 -- Vacía los resultados anteriores, ejecuta todos los tests y muestra el
 -- resultado de cada uno y el total de PASS y FAIL
--- =============================================================
+
 DELIMITER //
 CREATE OR REPLACE PROCEDURE p_run_tests()
 BEGIN
